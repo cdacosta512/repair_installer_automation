@@ -1,13 +1,34 @@
-# RAPID7 INSTALLER SCRIPT
 #!/bin/bash
+
+# RAPID7 INSTALLER SCRIPT
+
+
+# Ask the customer to run as sudo
+if [ $USER != "root" ]
+then 
+    echo "WARNING: Please elevate to root user / 'sudo su' then rerun script."
+    exit 1
+else
+    echo "==> Running script as root"
+fi
+
+# Setting install directory
+echo "Did you install Rapid7 in the default diretory? (y/N) "
+read directory_answer
+
+if [$directory_answer != "y"]
+then
+    echo "What directory is Rapid7 installed in: (format: /my/directory)"
+    read set_directory
+
+
+
 
 ###########################################
 # Checking to see if the service is running
 ###########################################
 
-# Ask the customer to run as sudo
-
-echo "Checking the status of the nexpose service..."
+echo "==> Checking the status of the nexpose service"
 sleep 2
 
 service_name="nexposeconsole"
@@ -15,7 +36,7 @@ nexpose_srv="Nexpose"
 
 # If the service is running it will let the user know and attempt to shut it down 
 
-if systemctl is-active --quiet "$service_name.service" ; then
+if systemctl is-active --quiet "$service_name.service" ; then                       # Review
   echo "==> $nexpose_srv is running"
   sleep 2
   echo "==> Attempting to shutdown the nexpose service in prep for the repair install..."
@@ -43,7 +64,8 @@ file=$(sudo find / -iname 'Rapid7*' | grep --include=bin.* "Rapid7Setup-Linux64.
 if [ -f $file == *"/Rapid7Setup-Linux64.bin" ]
 then
     echo "==> An older version of the Rapid7 Installer was found. Removing and downloading a fresh installer."
-    sudo rm $file                                                                                           # Delete older installer found
+    sudo rm $file
+                                                                                              # Delete older installer found
     cd /tmp/
     wget https://download2.rapid7.com/download/InsightVM/Rapid7Setup-Linux64.bin
     echo "==> New installer has been downloaded."
@@ -54,3 +76,9 @@ else
     chmod +x /tmp/Rapid7Setup-Linux64.bin                                                                   # add execution permissions to it.
     echo "==> New installer has been downloaded."
 fi
+
+
+#######################################################
+#                     Backup process
+#######################################################
+
