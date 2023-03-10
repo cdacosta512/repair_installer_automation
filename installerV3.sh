@@ -1,16 +1,35 @@
 # RAPID7 INSTALLER SCRIPT
 #!/bin/bash
 
-echo "Rapid7 Repair Install Tool"
-sleep 1
-echo ""
-echo "Disclaimer: This tool should only be ran per the instructions of Rapid7 Support."
-sleep 3
-echo ""
-echo "Starting the Rapid7 Repair Install Tool now..."
+###########################################
+# Checking to see if the service is running
+###########################################
+
+echo "Checking the status of the nexpose service..."
 sleep 2
 
+service_name="nexposeconsole"
+nexpose_srv="Nexpose"
 
+# If the service is running it will let the user know and attempt to shut it down 
+
+if systemctl is-active --quiet "$service_name.service" ; then
+  echo "==> $nexpose_srv is running"
+  sleep 2
+  echo "==> Attempting to shutdown the nexpose service in prep for the repair install..."
+  sudo systemctl stop $service_name.service
+  echo "==> $nexpose_srv is now stopped"
+  echo "Continuing the repair install process"
+else
+  echo "==> $nexpose_srv is not running"
+  sleep 2
+  echo "==> Continuing the repair install process"
+fi
+
+
+#######################################################
+# Checking for older installers and downloading new one
+#######################################################
 
 # Fills the time for when the find command runs
 echo "Looking for older version of Rapid7 Installer. Please wait..."
